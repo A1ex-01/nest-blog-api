@@ -4,20 +4,29 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostModule } from './post/post.module';
 import { Post } from './model/Post';
 import { PostDetail } from './model/PostDetail';
-console.log(process.env);
-const dbImporter = TypeOrmModule.forRoot({
-  type: 'mysql',
-  host: '106.54.215.126',
-  port: 3306,
-  username: 'root',
-  password: 'Vae20.30Peter',
-  database: 'blog',
-  entities: [Post, PostDetail],
-  synchronize: false,
+import { ConfigModule, ConfigService } from '@nestjs/config';
+const dbImporter = TypeOrmModule.forRootAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => ({
+    type: 'mysql',
+    host: configService.get<string>('NEST_DB_HOST'),
+    port: 3306,
+    username: configService.get<string>('NEST_DB_USERNAME'),
+    password: configService.get<string>('NEST_DB_PASSWORD'),
+    database: configService.get<string>('NEST_DB_NAME'),
+    entities: [Post, PostDetail],
+    synchronize: false,
+  }),
 });
 @Module({
-  imports: [dbImporter, PostModule],
-  // controllers: [PostController],
-  // providers: [PostService],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: ['.env'],
+      isGlobal: true,
+    }),
+    dbImporter,
+    PostModule,
+  ],
 })
 export class AppModule {}
