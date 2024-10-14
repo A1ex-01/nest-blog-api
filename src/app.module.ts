@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostModule } from './post/post.module';
 import { Post } from './model/Post';
 import { PostDetail } from './model/PostDetail';
+console.log(process.env);
 const dbImporter = TypeOrmModule.forRoot({
   type: 'mysql',
   host: '106.54.215.126',
