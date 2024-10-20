@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
 
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostModule } from './post/post.module';
-import { Post } from './model/Post';
-import { PostDetail } from './model/PostDetail';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryModule } from './category/category.module';
 import { Category } from './model/Category';
+import { Post } from './model/Post';
+import { PostDetail } from './model/PostDetail';
+import { Tag } from './model/Tag';
+import { User } from './model/User';
+import { PostModule } from './post/post.module';
+import { TagModule } from './tag/tag.module';
+import { UserModule } from './user/user.module';
 const dbImporter = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
@@ -17,7 +21,7 @@ const dbImporter = TypeOrmModule.forRootAsync({
     username: configService.get<string>('NEST_DB_USERNAME'),
     password: configService.get<string>('NEST_DB_PASSWORD'),
     database: configService.get<string>('NEST_DB_NAME'),
-    entities: [Post, PostDetail, Category],
+    entities: [Post, PostDetail, Category, Tag, User],
     synchronize: false,
   }),
 });
@@ -30,6 +34,8 @@ const dbImporter = TypeOrmModule.forRootAsync({
     dbImporter,
     PostModule,
     CategoryModule,
+    TagModule,
+    UserModule,
   ],
 })
 export class AppModule {}
