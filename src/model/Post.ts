@@ -5,6 +5,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Category } from './Category';
 import { PostDetail } from './PostDetail';
 import { User } from './User';
 
@@ -30,6 +31,11 @@ export class Post {
 
   @Column()
   category_id: string;
+
+  @OneToOne(() => Category, (category) => category.post, { eager: true })
+  @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
+  category: Category;
+
   @Column()
   createdAt: Date;
 

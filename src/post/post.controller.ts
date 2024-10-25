@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PostService } from './post.service';
 
 @Controller('posts')
@@ -11,5 +11,10 @@ export class PostController {
       current: Number(current),
       pageSize: Number(pageSize),
     });
+  }
+
+  @Get(':uuid')
+  findOne(@Param('uuid') uuid: string) {
+    return this.postService.findOne(uuid);
   }
 }
