@@ -36,16 +36,29 @@ export class NotionService {
   }
   async getPageInfo(pageId: string) {
     try {
+      const detail: any = await this.notion.pages.retrieve({
+        page_id: pageId,
+      });
+      const title = detail?.properties?.['名称'].title[0].plain_text;
+      const createdAt = detail?.properties?.['创建时间'].created_time;
+      const updatedAt = detail?.properties?.['更新时间'].last_edited_time;
+      const tags = detail?.properties?.['标签'].multi_select;
+      const category = detail?.properties?.['分类'].select;
+      const cover = detail?.cover?.external?.url;
       const response = await this.n2m.pageToMarkdown(pageId);
-      // console.log(
-      //   `🐛 🐞  Response ➡ ${JSON.stringify(response, null, 2)} 🐞 🐛 `,
-      // );
       return {
+        pageId,
+        cover,
+        title,
+        createdAt,
+        updatedAt,
+        tags,
+        category,
         content: this.n2m.toMarkdownString(response)?.parent,
       };
     } catch (error: any) {
       console.log(`❗❗ Error  ➡ ${JSON.stringify(error, null, 2)}❗ ❗`);
     }
-    return `This action returns all notion`;
+    return {};
   }
 }

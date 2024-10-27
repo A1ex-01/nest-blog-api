@@ -5,8 +5,6 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Category } from './Category';
-import { PostDetail } from './PostDetail';
 import { User } from './User';
 
 @Entity('article')
@@ -21,34 +19,37 @@ export class Post {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' }) // 指定 Article 表的 id 对应 ArticleDetail 表的 article_id
   userDetail: User;
 
-  @Column()
-  title: string;
+  // @Column()
+  // title: string;
 
-  @Column()
-  desc: string;
-  @Column()
-  cover: string;
+  // @Column()
+  // desc: string;
+  // @Column()
+  // cover: string;
 
-  @Column()
-  category_id: string;
+  // @Column()
+  // category_id: string;
 
-  @OneToOne(() => Category, (category) => category.post, { eager: true })
-  @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
-  category: Category;
+  // @OneToOne(() => Category, (category) => category.post, { eager: true })
+  // @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
+  // category: Category;
 
-  @Column()
-  createdAt: Date;
+  // @Column()
+  // createdAt: Date;
 
-  @Column()
-  updatedAt: Date;
+  // @Column()
+  // updatedAt: Date;
 
   @Column()
   deletedAt: Date;
 
-  @OneToOne(() => PostDetail, (PostDetail) => PostDetail.post, { eager: true })
-  @JoinColumn({ name: 'id', referencedColumnName: 'article_id' }) // 指定 Article 表的 id 对应 ArticleDetail 表的 article_id
-  detail: PostDetail; // 查询时通过 detail 返回 ArticleDetail 信息
+  // @OneToOne(() => PostDetail, (PostDetail) => PostDetail.post, { eager: true })
+  // @JoinColumn({ name: 'id', referencedColumnName: 'article_id' }) // 指定 Article 表的 id 对应 ArticleDetail 表的 article_id
+  // detail: PostDetail; // 查询时通过 detail 返回 ArticleDetail 信息
+
+  // @Column()
+  // tag_id: string;
 
   @Column()
-  tag_id: string;
+  notion_page_id: string;
 }

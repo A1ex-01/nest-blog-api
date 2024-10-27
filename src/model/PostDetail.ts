@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
-import { Post } from './Post';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('article_detail')
 export class PostDetail {
@@ -11,7 +10,7 @@ export class PostDetail {
 
   @Column()
   article_id: string;
-  // 建立与 Article 的反向关系
-  @OneToOne(() => Post, (post) => post.detail)
-  post: Post;
+  // // 建立与 Article 的反向关系
+  // @OneToOne(() => Post, (post) => post.detail)
+  // post: Post;
 }

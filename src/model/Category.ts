@@ -1,5 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Post } from './Post';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('category')
 export class Category {
@@ -11,7 +10,7 @@ export class Category {
 
   @Column()
   createdAt: Date;
-  // 建立与 Article 的反向关系
-  @OneToOne(() => Post, (post) => post.category)
-  post: Post;
+  // // 建立与 Article 的反向关系
+  // @OneToOne(() => Post, (post) => post.category)
+  // post: Post;
 }
