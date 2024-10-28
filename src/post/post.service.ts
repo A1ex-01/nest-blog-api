@@ -38,8 +38,13 @@ export class PostService {
       ...params,
     };
   }
-  findOne(id: string): Promise<Post> {
-    return this.postsRepository.findOneBy({ id });
+  async findOne(id: string): Promise<any> {
+    const data = await this.postsRepository.findOneBy({ notion_page_id: id });
+    const notionBlog = await this.notionService.getPageInfo(id);
+    return {
+      ...data,
+      notion: notionBlog,
+    };
   }
   findManyByIds(ids: string[]): Promise<Post[]> {
     return this.postsRepository.findBy({ id: In(ids) });
