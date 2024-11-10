@@ -28,6 +28,7 @@
     "@nestjs/swagger": "^7.4.2",
     "@nestjs/typeorm": "^10.0.2",
     "@notionhq/client": "^2.2.15",
+    "@tryfabric/martian": "^1.2.4",
     "axios": "^1.7.7",
     "lodash": "^4.17.21",
     "mysql2": "^3.11.3",
