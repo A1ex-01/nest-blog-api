@@ -1,5 +1,15 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { LoginGuard } from 'src/Guard/LoginGuard';
+import { Post } from 'src/model/Post';
 import { PostService } from './post.service';
 @ApiTags('文章')
 @Controller('posts')
@@ -21,5 +31,16 @@ export class PostController {
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string) {
     return this.postService.findOne(uuid);
+  }
+
+  @ApiOperation({ summary: '更新文章' })
+  @Put(':uuid')
+  @UseGuards(LoginGuard)
+  update(@Param('uuid') uuid: string, @Body() data: Partial<Post>) {
+    console.log('🚀 ~ PostController ~ update ~ uuid:', uuid, data);
+    return this.postService.update({
+      id: uuid,
+      notion_page_id: data?.notion_page_id,
+    });
   }
 }

@@ -5,7 +5,7 @@ import { Post } from 'src/model/Post';
 import { Tag } from 'src/model/Tag';
 import { NotionService } from 'src/notion/notion.service';
 import { ICP, IPaginationRes } from 'src/types';
-import { In, Repository } from 'typeorm';
+import { In, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class PostService {
@@ -52,7 +52,15 @@ export class PostService {
 
   // 创建新的 post
   create(post: Partial<Post>): Promise<Post> {
-    return this.postsRepository.save(post);
+    return this.postsRepository.findOne({
+      where: { notion_page_id: post.notion_page_id },
+    });
+  }
+  async update(post: Partial<Post>): Promise<UpdateResult> {
+    const res = await this.postsRepository.update(post?.id, {
+      notion_page_id: post.notion_page_id,
+    });
+    return res;
   }
   // 删除 post
   async remove(id: number): Promise<void> {

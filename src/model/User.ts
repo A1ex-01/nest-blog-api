@@ -28,6 +28,8 @@ export class User {
   @Column()
   updatedAt: Date;
 
+  @Column()
+  password: string;
   // 建立与 Article 的反向关系
   @OneToOne(() => Post, (post) => post.userDetail)
   post: Post;

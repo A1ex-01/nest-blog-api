@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryModule } from './category/category.module';
 import { Category } from './model/Category';
@@ -26,6 +27,11 @@ const dbImporter = TypeOrmModule.forRootAsync({
     synchronize: false,
   }),
 });
+const jwtImporter = JwtModule.register({
+  global: true,
+  secret: 'a1ex',
+  signOptions: { expiresIn: '1d' },
+});
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +39,7 @@ const dbImporter = TypeOrmModule.forRootAsync({
       isGlobal: true,
     }),
     dbImporter,
+    jwtImporter,
     PostModule,
     CategoryModule,
     TagModule,

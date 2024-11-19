@@ -1,10 +1,41 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { LoginGuard } from 'src/Guard/LoginGuard';
 import { UserService } from './user.service';
 
-@Controller('users')
+@ApiTags('用户')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  @ApiOperation({ summary: '登录' })
+  @Post('login')
+  login(@Body() user: { username: string; password: string }) {
+    return this.userService.login(user);
+  }
+  @ApiOperation({ summary: '获取用户信息' })
+  @Get('getInfo')
+  @UseGuards(LoginGuard)
+  getInfo(
+    @Req()
+    req: {
+      user: {
+        id: string;
+        username: string;
+      };
+    },
+  ) {
+    console.log('🚀 ~ UserController ~ getInfo ~ req:', req);
+    return this.userService.getInfo(req.user.id);
+  }
+  @ApiOperation({ summary: '通过 uuid 获取用户信息' })
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string) {
     return this.userService.findOne(uuid);
