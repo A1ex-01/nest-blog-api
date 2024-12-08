@@ -1,11 +1,14 @@
 import {
+  CallHandler,
+  ExecutionContext,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import BusinessErrorException, {
+  errorCodeEnum,
+} from './BusinessErrorException';
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
@@ -17,11 +20,8 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
         data,
       })),
       catchError((err) => {
-        throw {
-          success: false,
-          message: err.message || 'Operation failed',
-          data: null,
-        };
+        if (err instanceof BusinessErrorException) return of(err);
+        return of(BusinessErrorException.throwError(errorCodeEnum.SYSTEMERROR));
       }),
     );
   }

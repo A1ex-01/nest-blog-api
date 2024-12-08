@@ -10,6 +10,7 @@ import { PostDetail } from './model/PostDetail';
 import { Tag } from './model/Tag';
 import { User } from './model/User';
 import { NotionModule } from './notion/notion.module';
+import { OtherModule } from './other/other.module';
 import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
 import { UserModule } from './user/user.module';
@@ -45,6 +46,7 @@ const jwtImporter = JwtModule.register({
     TagModule,
     UserModule,
     NotionModule,
+    OtherModule,
   ],
 })
 export class AppModule {}
