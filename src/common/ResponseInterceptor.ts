@@ -4,11 +4,8 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Observable, of } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import BusinessErrorException, {
-  errorCodeEnum,
-} from './BusinessErrorException';
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
@@ -20,8 +17,8 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
         data,
       })),
       catchError((err) => {
-        if (err instanceof BusinessErrorException) return of(err);
-        return of(BusinessErrorException.throwError(errorCodeEnum.SYSTEMERROR));
+        // 直接抛出异常，让 GlobalExceptionFilter 处理
+        return throwError(() => err);
       }),
     );
   }

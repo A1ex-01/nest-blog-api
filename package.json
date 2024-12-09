@@ -31,6 +31,8 @@
     "@notionhq/client": "^2.2.15",
     "@tryfabric/martian": "^1.2.4",
     "axios": "^1.7.7",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "lodash": "^4.17.21",
     "mysql2": "^3.11.3",
     "notion-to-md": "^3.1.1",

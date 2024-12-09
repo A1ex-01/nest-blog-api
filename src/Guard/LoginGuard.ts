@@ -3,17 +3,18 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
+import BusinessErrorException, {
+  errorCodeEnum,
+} from 'src/common/BusinessErrorException';
 
 @Injectable()
 export class LoginGuard implements CanActivate {
   @Inject(JwtService)
   private jwtService: JwtService;
-
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
@@ -25,7 +26,7 @@ export class LoginGuard implements CanActivate {
     console.log('🚀 ~ LoginGuard ~ bearer:', bearer);
 
     if (!bearer || bearer.length < 2) {
-      throw new UnauthorizedException('登录 token 错误');
+      throw BusinessErrorException.throwError(errorCodeEnum.UNAUTHORIZED);
     }
 
     const token = bearer[1];
@@ -37,7 +38,7 @@ export class LoginGuard implements CanActivate {
       return true;
     } catch (e: any) {
       console.log('🚀 ~ LoginGuard ~ e:', e);
-      throw new UnauthorizedException('登录 token 失效，请重新登录');
+      throw BusinessErrorException.throwError(errorCodeEnum.UNAUTHORIZED);
     }
   }
 }

@@ -8,6 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { LoginUserDto } from 'src/dto';
 import { LoginGuard } from 'src/Guard/LoginGuard';
 import { UserService } from './user.service';
 
@@ -17,7 +18,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
   @ApiOperation({ summary: '登录' })
   @Post('login')
-  login(@Body() user: { username: string; password: string }) {
+  login(@Body() user: LoginUserDto) {
+    console.log('🚀 ~ UserController ~ login ~ user:', user);
     return this.userService.login(user);
   }
   @ApiOperation({ summary: '获取用户信息' })

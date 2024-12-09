@@ -20,6 +20,7 @@ export class PostService {
     let [data, total] = await this.postsRepository.findAndCount({
       take: params.pageSize,
       skip: (params.current - 1) * params.pageSize,
+      order: { publishedAt: 'DESC' },
     });
     const ids = uniqBy(data, 'notion_page_id');
     const notionBlogs = await Promise.all(
@@ -58,7 +59,8 @@ export class PostService {
   }
   async update(post: Partial<Post>): Promise<UpdateResult> {
     const res = await this.postsRepository.update(post?.id, {
-      notion_page_id: post.notion_page_id,
+      // notion_page_id: post.notion_page_id,
+      ...post,
     });
     return res;
   }

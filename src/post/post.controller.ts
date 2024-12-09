@@ -40,7 +40,7 @@ export class PostController {
     console.log('🚀 ~ PostController ~ update ~ uuid:', uuid, data);
     return this.postService.update({
       id: uuid,
-      notion_page_id: data?.notion_page_id,
+      ...data,
     });
   }
 }

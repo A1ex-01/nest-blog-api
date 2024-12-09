@@ -1,7 +1,11 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import BusinessErrorException, {
+  errorCodeEnum,
+} from 'src/common/BusinessErrorException';
 import { User } from 'src/model/User';
+import { encryptPassword } from 'src/utils/cryptogram';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -19,22 +23,33 @@ export class UserService {
     if (userEntity) {
       // 验证密码
       const { password } = userEntity;
-      if (password === user.password) {
-        const token = await this.jwtService.signAsync({
+      const encryptedPassword = encryptPassword(user.password);
+      console.log(
+        '🚀 ~ UserService ~ login ~ encryptedPassword:',
+        encryptedPassword,
+      );
+      if (password === encryptedPassword) {
+        const accessToken = await this.jwtService.signAsync({
           user: {
             id: userEntity.id,
             username: userEntity.username,
           },
         });
         return {
-          token,
+          accessToken,
           user: userEntity,
         };
       } else {
-        throw new UnauthorizedException('密码错误');
+        throw BusinessErrorException.throwError(
+          errorCodeEnum.UNAUTHORIZED,
+          '密码错误',
+        );
       }
     } else {
-      throw new UnauthorizedException('用户名或密码错误');
+      throw BusinessErrorException.throwError(
+        errorCodeEnum.UNAUTHORIZED,
+        '用户不存在',
+      );
     }
   }
   findAll(): Promise<User[]> {

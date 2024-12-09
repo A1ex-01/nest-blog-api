@@ -34,14 +34,17 @@ export class Post {
   // @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
   // category: Category;
 
-  // @Column()
-  // createdAt: Date;
+  @Column()
+  createdAt: Date;
 
-  // @Column()
-  // updatedAt: Date;
+  @Column()
+  updatedAt: Date;
 
   @Column()
   deletedAt: Date;
+
+  @Column()
+  publishedAt: Date;
 
   // @OneToOne(() => PostDetail, (PostDetail) => PostDetail.post, { eager: true })
   // @JoinColumn({ name: 'id', referencedColumnName: 'article_id' }) // 指定 Article 表的 id 对应 ArticleDetail 表的 article_id
