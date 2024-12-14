@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TimerMiddleware } from 'src/common/middlewares/timer/timer.middleware';
 import { Post } from 'src/model/Post';
 import { Tag } from 'src/model/Tag';
 import { NotionService } from 'src/notion/notion.service';
@@ -11,4 +12,8 @@ import { PostService } from './post.service';
   controllers: [PostController],
   providers: [PostService, NotionService],
 })
-export class PostModule {}
+export class PostModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TimerMiddleware).forRoutes('*');
+  }
+}

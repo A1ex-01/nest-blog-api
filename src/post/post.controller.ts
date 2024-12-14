@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
+  ParseIntPipe,
   Put,
   Query,
   UseGuards,
@@ -14,16 +16,21 @@ import { PostService } from './post.service';
 @ApiTags('文章')
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  @Inject()
+  private readonly postService: PostService;
+  constructor() {}
 
   @ApiOperation({ summary: '文章列表' })
   @Get()
   @ApiQuery({ name: 'current', required: false })
   @ApiQuery({ name: 'pageSize', required: false })
-  findAll(@Query('current') current = 1, @Query('pageSize') pageSize = 10) {
+  findAll(
+    @Query('current', ParseIntPipe) current = 1,
+    @Query('pageSize', ParseIntPipe) pageSize = 10,
+  ) {
     return this.postService.findAll({
-      current: Number(current),
-      pageSize: Number(pageSize),
+      current: current,
+      pageSize: pageSize,
     });
   }
 
@@ -37,7 +44,6 @@ export class PostController {
   @Put(':uuid')
   @UseGuards(LoginGuard)
   update(@Param('uuid') uuid: string, @Body() data: Partial<Post>) {
-    console.log('🚀 ~ PostController ~ update ~ uuid:', uuid, data);
     return this.postService.update({
       id: uuid,
       ...data,

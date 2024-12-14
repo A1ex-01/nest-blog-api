@@ -17,7 +17,6 @@ export class NotionController {
   })
   @Get('/:dbId/:pageId')
   getPageInfo(@Param('dbId') dbId: string, @Param('pageId') pageId: string) {
-    console.log('🚀 ~ NotionController ~ getPageInfo ~ pageId:', pageId);
     return this.notionService.getPageInfo(pageId);
   }
   @ApiOperation({

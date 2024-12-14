@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { uniqBy } from 'lodash';
+import { find, unionBy } from 'lodash';
 import { Post } from 'src/model/Post';
 import { Tag } from 'src/model/Tag';
 import { NotionService } from 'src/notion/notion.service';
@@ -17,14 +17,15 @@ export class PostService {
     private readonly notionService: NotionService,
   ) {}
   async findAll(params: ICP): Promise<IPaginationRes<Post>> {
-    let [data, total] = await this.postsRepository.findAndCount({
+    const [data, total] = await this.postsRepository.findAndCount({
       take: params.pageSize,
       skip: (params.current - 1) * params.pageSize,
       order: { publishedAt: 'DESC' },
     });
-    const ids = uniqBy(data, 'notion_page_id');
-    const notionBlogs = await Promise.all(
-      ids.map((id) => this.notionService.getPageInfo(id.notion_page_id)),
+    const ids = unionBy(data.map((item) => item.notion_page_id));
+    const allNotionBlogsByIds = await this.notionService.findByPageIds(
+      process.env.NOTION_DATABASE_BLOG_ID,
+      ids,
     );
 
     return {
@@ -32,7 +33,10 @@ export class PostService {
         return {
           ...item,
           notion:
-            notionBlogs.find((n) => n.pageId === item.notion_page_id) || {},
+            find(
+              allNotionBlogsByIds,
+              (blog) => blog.pageId === item.notion_page_id,
+            ) || {},
         };
       }),
       total,
