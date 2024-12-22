@@ -43,7 +43,10 @@ export class Post {
   @Column()
   deletedAt: Date;
 
-  @Column()
+  @Column({
+    type: 'timestamp',
+    nullable: false,
+  })
   publishedAt: Date;
 
   // @OneToOne(() => PostDetail, (PostDetail) => PostDetail.post, { eager: true })
