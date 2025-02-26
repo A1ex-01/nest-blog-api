@@ -20,17 +20,19 @@ export class NotionService {
     });
     this.n2m = new NotionToMarkdown({ notionClient: this.notion });
   }
-  async notionPageToBlog(detail: any) {
+  async notionPageToBlog(detail: any, hideContent: boolean = false) {
     const pageId = detail.id.replaceAll('-', '');
-    console.log('🚀 ~ NotionService ~ notionPageToBlog ~ pageId:', pageId);
     const title = detail?.properties?.['名称'].title[0].plain_text;
     const createdAt = detail?.properties?.['创建时间'].created_time;
     const updatedAt = detail?.properties?.['更新时间'].last_edited_time;
     const tags = detail?.properties?.['标签'].multi_select;
     const category = detail?.properties?.['分类'].select;
     const cover = detail?.cover?.external?.url;
-    const response = await this.n2m.pageToMarkdown(pageId);
-
+    let content;
+    if (!hideContent) {
+      const response = await this.n2m.pageToMarkdown(pageId);
+      content = this.n2m.toMarkdownString(response)?.parent;
+    }
     return {
       pageId,
       cover,
@@ -39,8 +41,8 @@ export class NotionService {
       updatedAt,
       tags,
       category,
-      content: this.n2m.toMarkdownString(response)?.parent,
-      // content: '',
+      content: content,
+      // content: '11',
     };
   }
   async findAll(dbId: string): Promise<INotionBlog[]> {
@@ -53,11 +55,10 @@ export class NotionService {
   }
   async findByPageIds(dbId: string, ids: string[]) {
     const allNotionBlogs = await this.findAll(dbId);
-
     const formatedNotionBlogs = await Promise.all(
       allNotionBlogs
         .filter((item) => ids.includes(item.id.replaceAll('-', '')))
-        .map((item) => this.notionPageToBlog(item)),
+        .map((item) => this.notionPageToBlog(item, true)),
     );
     return formatedNotionBlogs;
   }
