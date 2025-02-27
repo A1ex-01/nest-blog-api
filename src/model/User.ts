@@ -28,7 +28,17 @@ export class User {
   @Column()
   updatedAt: Date;
 
+  @Column()
+  password: string;
   // 建立与 Article 的反向关系
   @OneToOne(() => Post, (post) => post.userDetail)
   post: Post;
+
+  // 可选：重写 toJSON 方法
+  toJSON() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...rest } = this;
+    // 序列化隐藏 password
+    return rest;
+  }
 }

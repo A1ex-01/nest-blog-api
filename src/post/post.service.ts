@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { uniqBy } from 'lodash';
+import { find, unionBy } from 'lodash';
+import { CreatePostDto } from 'src/dto';
 import { Post } from 'src/model/Post';
 import { Tag } from 'src/model/Tag';
 import { NotionService } from 'src/notion/notion.service';
 import { ICP, IPaginationRes } from 'src/types';
-import { In, Repository } from 'typeorm';
+import { In, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class PostService {
@@ -17,13 +18,15 @@ export class PostService {
     private readonly notionService: NotionService,
   ) {}
   async findAll(params: ICP): Promise<IPaginationRes<Post>> {
-    let [data, total] = await this.postsRepository.findAndCount({
+    const [data, total] = await this.postsRepository.findAndCount({
       take: params.pageSize,
       skip: (params.current - 1) * params.pageSize,
+      order: { publishedAt: 'DESC' },
     });
-    const ids = uniqBy(data, 'notion_page_id');
-    const notionBlogs = await Promise.all(
-      ids.map((id) => this.notionService.getPageInfo(id.notion_page_id)),
+    const ids = unionBy(data.map((item) => item.notion_page_id));
+    const allNotionBlogsByIds = await this.notionService.findByPageIds(
+      process.env.NOTION_DATABASE_BLOG_ID,
+      ids,
     );
 
     return {
@@ -31,7 +34,10 @@ export class PostService {
         return {
           ...item,
           notion:
-            notionBlogs.find((n) => n.pageId === item.notion_page_id) || {},
+            find(
+              allNotionBlogsByIds,
+              (blog) => blog.pageId === item.notion_page_id,
+            ) || {},
         };
       }),
       total,
@@ -51,8 +57,17 @@ export class PostService {
   }
 
   // 创建新的 post
-  create(post: Partial<Post>): Promise<Post> {
-    return this.postsRepository.save(post);
+  async create(post: CreatePostDto): Promise<Post> {
+    console.log('🚀 ~ PostService ~ create ~ post:', post);
+    const p = this.postsRepository.create(post);
+    return this.postsRepository.save(p);
+  }
+  async update(post: Partial<Post>): Promise<UpdateResult> {
+    const res = await this.postsRepository.update(post?.id, {
+      // notion_page_id: post.notion_page_id,
+      ...post,
+    });
+    return res;
   }
   // 删除 post
   async remove(id: number): Promise<void> {

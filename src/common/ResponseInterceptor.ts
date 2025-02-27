@@ -1,11 +1,11 @@
 import {
+  CallHandler,
+  ExecutionContext,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
@@ -17,11 +17,8 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
         data,
       })),
       catchError((err) => {
-        throw {
-          success: false,
-          message: err.message || 'Operation failed',
-          data: null,
-        };
+        // 直接抛出异常，让 GlobalExceptionFilter 处理
+        return throwError(() => err);
       }),
     );
   }
