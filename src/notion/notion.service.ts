@@ -161,6 +161,7 @@ export class NotionService {
     }
   }
   async syncBlogs() {
+    console.log('111');
     const notionBlogs = await this.findAll('11ed250f8d4d8017b9e0fab43dfea888');
     const formatNotionBlogs = await Promise.all(
       notionBlogs?.map((notionBlog) => this.syncBlog(notionBlog)),
@@ -185,6 +186,7 @@ export class NotionService {
       'updated_at',
       'category',
       'tags',
+      'content',
     ]);
     // const formatInfo = await this.getPageInfo(notionInfo?.id?.replaceAll('-', ''));
     const notionBlogInfo = await this.notionBlogsService.getInfo(

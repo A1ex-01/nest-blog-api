@@ -19,14 +19,12 @@ export class NotionController {
   getPageInfo(@Param('dbId') dbId: string, @Param('pageId') pageId: string) {
     return this.notionService.getPageInfo(pageId);
   }
-  @ApiOperation({
-    summary: 'insert page to database',
-  })
+
   @ApiOperation({
     summary: 'sync blog',
   })
   @Post('/syncBlogs')
-  syncBlog() {
+  syncBlogs() {
     return this.notionService.syncBlogs();
   }
   @Post('/:dbId')
