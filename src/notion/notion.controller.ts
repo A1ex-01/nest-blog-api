@@ -22,6 +22,13 @@ export class NotionController {
   @ApiOperation({
     summary: 'insert page to database',
   })
+  @ApiOperation({
+    summary: 'sync blog',
+  })
+  @Post('/syncBlogs')
+  syncBlog() {
+    return this.notionService.syncBlogs();
+  }
   @Post('/:dbId')
   insetPageInDb(
     @Param('dbId') dbId: string,

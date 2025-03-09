@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { find, unionBy } from 'lodash';
 import { CreatePostDto } from 'src/dto';
 import { Post } from 'src/model/Post';
 import { Tag } from 'src/model/Tag';
@@ -23,23 +22,9 @@ export class PostService {
       skip: (params.current - 1) * params.pageSize,
       order: { publishedAt: 'DESC' },
     });
-    const ids = unionBy(data.map((item) => item.notion_page_id));
-    const allNotionBlogsByIds = await this.notionService.findByPageIds(
-      process.env.NOTION_DATABASE_BLOG_ID,
-      ids,
-    );
 
     return {
-      list: data?.map((item) => {
-        return {
-          ...item,
-          notion:
-            find(
-              allNotionBlogsByIds,
-              (blog) => blog.pageId === item.notion_page_id,
-            ) || {},
-        };
-      }),
+      list: data,
       total,
       ...params,
     };
@@ -58,7 +43,6 @@ export class PostService {
 
   // 创建新的 post
   async create(post: CreatePostDto): Promise<Post> {
-    console.log('🚀 ~ PostService ~ create ~ post:', post);
     const p = this.postsRepository.create(post);
     return this.postsRepository.save(p);
   }
