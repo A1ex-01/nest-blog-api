@@ -22,7 +22,6 @@ export class PostService {
       skip: (params.current - 1) * params.pageSize,
       order: { publishedAt: 'DESC' },
     });
-
     return {
       list: data,
       total,
