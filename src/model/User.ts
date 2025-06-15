@@ -1,3 +1,4 @@
+import { omit } from 'lodash';
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from './Post';
 
@@ -39,6 +40,6 @@ export class User {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...rest } = this;
     // 序列化隐藏 password
-    return rest;
+    return omit(rest, 'desc');
   }
 }

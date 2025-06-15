@@ -5,6 +5,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { NotionBlogs } from './NotionBlogs';
 import { User } from './User';
 
 @Entity('article')
@@ -58,4 +59,8 @@ export class Post {
 
   @Column()
   notion_page_id: string;
+
+  @OneToOne(() => NotionBlogs, (notionBlog) => notionBlog, { eager: true })
+  @JoinColumn({ name: 'notion_page_id', referencedColumnName: 'page_id' }) // 指定 Article 表的 id 对应 ArticleDetail 表的 article_id
+  notionDetail: NotionBlogs;
 }

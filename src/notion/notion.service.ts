@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from '@notionhq/client';
 import { markdownToBlocks } from '@tryfabric/martian';
+import { pick } from 'lodash';
 import { NotionToMarkdown } from 'notion-to-md';
+import { NotionBlogsService } from 'src/notionBlogs/notionBlogs.service';
 import { IFormattedNotionPage } from 'src/types';
 import { INotionBlog } from 'src/types/notion';
 
@@ -10,19 +12,17 @@ export class NotionService {
   notion: Client;
   envConfig: any;
   n2m: NotionToMarkdown;
-  constructor() {
-    // this.envConfig = ConfigService.get
-  }
+
+  constructor(private readonly notionBlogsService: NotionBlogsService) {}
   onModuleInit() {
     this.notion = new Client({
-      // auth: this.envConfig.NOTION_API_KEY,
       auth: process.env.NOTION_API_KEY,
     });
     this.n2m = new NotionToMarkdown({ notionClient: this.notion });
   }
   async notionPageToBlog(detail: any, hideContent: boolean = false) {
     const pageId = detail.id.replaceAll('-', '');
-    const title = detail?.properties?.['名称'].title[0].plain_text;
+    const title = detail?.properties?.['名称'].title?.[0]?.plain_text || '';
     const createdAt = detail?.properties?.['创建时间'].created_time;
     const updatedAt = detail?.properties?.['更新时间'].last_edited_time;
     const tags = detail?.properties?.['标签'].multi_select;
@@ -31,14 +31,18 @@ export class NotionService {
     let content;
     if (!hideContent) {
       const response = await this.n2m.pageToMarkdown(pageId);
-      content = this.n2m.toMarkdownString(response)?.parent;
+      content = this.n2m.toMarkdownString(response)?.parent || '';
     }
     return {
       pageId,
+      page_id: pageId,
       cover,
+      cover_url: cover,
       title,
       createdAt,
+      created_at: createdAt,
       updatedAt,
+      updated_at: updatedAt,
       tags,
       category,
       content: content,
@@ -154,6 +158,54 @@ export class NotionService {
       }
     } catch (error) {
       console.error('Error appending content in batches:', error);
+    }
+  }
+  async syncBlogs() {
+    console.log('111');
+    const notionBlogs = await this.findAll('11ed250f8d4d8017b9e0fab43dfea888');
+    const formatNotionBlogs = await Promise.all(
+      notionBlogs?.map((notionBlog) => this.syncBlog(notionBlog)),
+    );
+    return formatNotionBlogs;
+  }
+  async syncBlog(notionBlog: any) {
+    // 传notionAPI blog 结构
+    if (!notionBlog?.id)
+      return {
+        id: -1,
+        status: '404',
+      };
+    const info = await this.notionPageToBlog({
+      ...notionBlog,
+    });
+    const notionInfo: any = pick(info, [
+      'page_id',
+      'title',
+      'cover_url',
+      'created_at',
+      'updated_at',
+      'category',
+      'tags',
+      'content',
+    ]);
+    // const formatInfo = await this.getPageInfo(notionInfo?.id?.replaceAll('-', ''));
+    const notionBlogInfo = await this.notionBlogsService.getInfo(
+      notionInfo.page_id,
+    );
+    if (notionBlogInfo?.page_id) {
+      // 已存在，更新
+      const res = await this.notionBlogsService.updateInfo(
+        notionBlogInfo?.page_id,
+        {
+          page_id: notionBlogInfo.page_id,
+          ...notionInfo,
+        },
+      );
+      return res;
+    } else {
+      // 创建
+      const res = await this.notionBlogsService.createNotionBlog(notionInfo);
+      return res;
     }
   }
 }
